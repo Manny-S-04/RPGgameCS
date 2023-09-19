@@ -1,36 +1,107 @@
-﻿using Engine.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Engine.Models;
+using Engine.Factories;
 namespace Engine.ViewModels
 {
-    public class GameSession
+    public class GameSession : BaseNotification
     {
-        // creating player property
+        private Location _currentLocation;
+        public World CurrentWorld { get; set; }
         public Player CurrentPlayer { get; set; }
-        public Location CurrentLocation { get; set; }
+        public Location CurrentLocation
+        {
+            get { return _currentLocation; }
+            set
+            {
+                _currentLocation = value;
 
-        // constructor
+                OnPropertyChanged(nameof(CurrentLocation));
+                OnPropertyChanged(nameof(HasLocationToNorth));
+                OnPropertyChanged(nameof(HasLocationToSouth));
+                OnPropertyChanged(nameof(HasLocationToEast));
+                OnPropertyChanged(nameof(HasLocationToWest));
+
+                GivePlayerQuestsAtLocation();
+
+            }
+        }
+
+        public bool HasLocationToNorth
+        {
+
+            get { return CurrentWorld.LocationAt(CurrentLocation.XCoordinate, CurrentLocation.YCoordinate + 1) != null; }
+
+        }
+
+        public bool HasLocationToSouth
+        {
+            get { return CurrentWorld.LocationAt(CurrentLocation.XCoordinate, CurrentLocation.YCoordinate - 1) != null; }
+
+        }
+
+        public bool HasLocationToWest
+        {
+            get { return CurrentWorld.LocationAt(CurrentLocation.XCoordinate -1, CurrentLocation.YCoordinate) != null; }
+
+        }
+        public bool HasLocationToEast
+        {
+            get { return CurrentWorld.LocationAt(CurrentLocation.XCoordinate +1, CurrentLocation.YCoordinate) != null; }
+
+        }
         public GameSession()
         {
-            // when a game session object is created a new player is also created due to this constructor 
-            CurrentPlayer = new Player();
-            CurrentPlayer.Name = "Player1";
-            CurrentPlayer.Gold = 1000000;
-            CurrentPlayer.CharacterClass = "Fighter";
-            CurrentPlayer.HitPoints = 10;
-            CurrentPlayer.ExperiencePoints = 0;
-            CurrentPlayer.Level = 1;
+            CurrentPlayer = new Player { Name = "Player", CharacterClass="Fighter",HitPoints=10,Gold=1000000,Level=1};
+            //WorldFactory factory = new WorldFactory(); PRE STATIC
+            //CurrentWorld = factory.CreateWorld();
+            CurrentWorld = WorldFactory.CreateWorld(); 
+            CurrentLocation = CurrentWorld.LocationAt(0, 0);
+        }
+        public void MoveNorth()
+        {
+            if (HasLocationToNorth)
+            {
+                CurrentLocation = CurrentWorld.LocationAt(CurrentLocation.XCoordinate, CurrentLocation.YCoordinate + 1);
 
-            CurrentLocation = new Location();
-            CurrentLocation.Name = "Home";
-            CurrentLocation.XCoordinate = 0;
-            CurrentLocation.YCoordinate = -1;
-            CurrentLocation.Description = "This is your house";
-            CurrentLocation.ImageName = "/Engine;component/Images/Locations/Home.png";
+            }
+        }
+        public void MoveEast()
+        {
+            if (HasLocationToEast)
+            { 
+            CurrentLocation = CurrentWorld.LocationAt(CurrentLocation.XCoordinate + 1, CurrentLocation.YCoordinate);
+            }
+        }
+        public void MoveSouth()
+        {
+            if (HasLocationToSouth)
+            {
+                CurrentLocation = CurrentWorld.LocationAt(CurrentLocation.XCoordinate, CurrentLocation.YCoordinate - 1);
+            }
+        }
+        public void MoveWest()
+        {
+            if(HasLocationToWest)
+            {
+                CurrentLocation = CurrentWorld.LocationAt(CurrentLocation.XCoordinate - 1, CurrentLocation.YCoordinate);
+
+            }
+        }
+
+        private void GivePlayerQuestsAtLocation()
+        {
+            foreach(Quest quest in CurrentLocation.QuestsAvailableHere)
+            {
+                if(!CurrentPlayer.Quests.Any(q => q.PlayerQuest.ID == quest.ID))
+                {
+                    CurrentPlayer.Quests.Add(new QuestStatus(quest));
+                }
+            }
         }
     }
 }
