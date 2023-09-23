@@ -34,6 +34,10 @@ namespace Engine.Factories
 
             if(standardItem != null)
             {
+                if(standardItem is Weapon weapon)
+                {
+                    return weapon.Clone();
+                }
                 return standardItem.Clone();
             }
             return null;
