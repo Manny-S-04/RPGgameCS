@@ -1,0 +1,18 @@
+﻿using System.Collections.ObjectModel;
+namespace Engine.Models
+{
+    public class Trader : BaseNotification
+    {
+        public string Name { get; set; }
+        public ObservableCollection<GameItem> Inventory { get; set; }
+        public Trader(string name)
+        {
+            Name = name;
+            Inventory = new ObservableCollection<GameItem>();
+        }
+        public void AddItemToInventory(GameItem item)
+        {
+            Inventory.Add(item);
+        }
+    }
+}
