@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using Engine.Models;
 using Engine.ViewModels;
 namespace WPFUI
 {
@@ -8,6 +9,33 @@ namespace WPFUI
         public TradeScreen()
         {
             InitializeComponent();
+        }
+        private void OnClick_Sell(object sender, RoutedEventArgs e)
+        {
+            GameItem item = ((FrameworkElement)sender).DataContext as GameItem;
+            if (item == null)
+            {
+                return;
+            }
+            Session.CurrentPlayer.Gold += item.Price;
+            Session.CurrentTrader.AddItemToInventory(item);
+            Session.CurrentPlayer.RemoveItemFromInventory(item);
+        }
+        private void OnClick_Buy(object sender, RoutedEventArgs e)
+        {
+            GameItem item = ((FrameworkElement)sender).DataContext as GameItem;
+            if (item == null)
+            {
+                return;
+            }
+            if (Session.CurrentPlayer.Gold < item.Price)
+            {
+                MessageBox.Show("You do not have enough gold");
+                return;
+            }
+            Session.CurrentPlayer.Gold -= item.Price;
+            Session.CurrentTrader.RemoveItemFromInventory(item);
+            Session.CurrentPlayer.AddItemToInventory(item);
         }
         private void OnClick_Close(object sender, RoutedEventArgs e)
         {
