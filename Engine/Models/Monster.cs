@@ -30,7 +30,7 @@ namespace Engine.Models
         public Monster(string name, string imageName, int maximumHitPoints, int hitPoints, int minimumDamage, int maximumDamage, int rewardExperiencePoints, int rewardGold)
         {
             Name = name;
-            ImageName = string.Format("C:\\Users\\mannys\\csCourse\\WPFUI\\Engine\\Images\\Enemies\\{0}", imageName);
+            ImageName = $"/Engine;component/Images/Enemies/{imageName}";
             MaxmimumHitPoints = maximumHitPoints;
             HitPoints = hitPoints;
             MinimumDamage = minimumDamage;
